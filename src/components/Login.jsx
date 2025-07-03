@@ -1,13 +1,37 @@
-import React, { useState } from "react";
+import React, { use, useRef, useState } from "react";
 import Header from "./Header";
+import { checkValidatedata } from "../utils/validate";
 
 const Login = () => {
 
 const [isSignInForm, setisSignInForm] = useState(true);
+const [ShowError, SetShowError] = useState(null);
+const email = useRef(null);
+const password = useRef(null);
+const name = useRef(null);
 
 const toggleSignin= ()=>{
   setisSignInForm(!isSignInForm);
 };
+                                
+
+const handleButtonClick = ()=>{
+    // Validate the form data
+    const Email = email.current.value;
+    const Password = password.current.value;
+    const Name = isSignInForm ? null : name.current?.value;
+
+    console.log(Email);
+    console.log(Password);
+    console.log(Name);
+    
+    const msg = checkValidatedata(Email,Password,Name); 
+    SetShowError(msg);
+
+    // signin /Signup
+     
+}
+
 
   return (
     <div>
@@ -21,24 +45,28 @@ https://assets.nflxext.com/ffe/siteui/vlv3/75b0ed49-75ab-4a63-bd45-37bc2c95cb73/
         ></img>
       </div>
 
-        <form className="w-3/12 absolute p-8 bg-black/80 my-24 mx-auto left-0 right-0 rounded-md text-white">
+        <form onSubmit={(e)=> e.preventDefault()} className="w-3/12 absolute p-8 bg-black/80 my-24 mx-auto left-0 right-0 rounded-md text-white">
       <h1 className="font-semibold text-3xl pb-6">{isSignInForm ? "Sign In" : "Sign UP"}</h1>
     {!isSignInForm && <input
+        ref={name}
         type="text"
         placeholder="Full Name"
         className="p-3 mb-4 w-full rounded-sm bg-gray-700 placeholder-gray-400"
       />}
       <input
+        ref={email}
         type="text"
         placeholder="Email "
         className="p-3 mb-4 w-full rounded-sm bg-gray-700 placeholder-gray-400"
       />
       <input
+      ref={password}
         type="password"
         placeholder="Password"
         className="p-3 mb-6 w-full rounded-sm bg-gray-700 placeholder-gray-400"
       />
-      <button className="p-3 mb-4 bg-red-600 w-full rounded-sm hover:bg-red-700 font-semibold cursor-pointer">
+      <p className="text-red-500 p-2 font-bold">{ShowError}</p>
+      <button className="p-3 mb-4 bg-red-600 w-full rounded-sm hover:bg-red-700 font-semibold cursor-pointer" onClick={handleButtonClick}>
         {isSignInForm ? "Sign In" :"Sign Up" }
       </button>
       <p className="p-4 cursor-pointer" onClick={toggleSignin}>{isSignInForm? "New to Netflix? Sign Up Now": "Already have an account, Sign In now"}</p>

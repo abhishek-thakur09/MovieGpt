@@ -15,3 +15,11 @@
 - Movie Gpt
     - Search bar
     - Movie Suggestions
+
+
+
+<!-- Deploy our app to firebase -->
+- Firebase login
+    - firebase init
+    
+
