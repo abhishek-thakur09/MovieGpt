@@ -4,15 +4,22 @@ import { checkValidatedata } from "../utils/validate";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/Firebase";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/UserSlice";
+
 
 const Login = () => {
+  const navigate = useNavigate();
   const [isSignInForm, setisSignInForm] = useState(true);
   const [ShowError, SetShowError] = useState(null);
   const email = useRef(null);
   const password = useRef(null);
   const name = useRef(null);
+  const dispatch = useDispatch();
 
   const toggleSignin = () => {
     setisSignInForm(!isSignInForm);
@@ -39,6 +46,27 @@ const Login = () => {
         .then((userCredential) => {
           const user = userCredential.user;
           console.log(user);
+
+          // UpdateProfile
+          updateProfile(user, {
+            displayName: Name,
+          })
+            .then(() => {
+              const {uid, email, displayName} = auth.currentUser;
+              dispatch(addUser({
+                uid: uid,
+                email:email,
+                displayName:displayName
+              }));
+              navigate("/browse");
+
+              // Profile updated!
+              // ...
+            })
+            .catch((error) => {
+              // An error occurred
+              // ...
+            });
         })
         .catch((error) => {
           const errorCode = error.code;
@@ -51,15 +79,19 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log(user);
+          navigate("/browse");
+
           // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          if("auth/invalid-credential_Firebase: Error (auth/invalid-credential)." == errorCode + "_" + errorMessage){
+          if (
+            "auth/invalid-credential_Firebase: Error (auth/invalid-credential)." ==
+            errorCode + "_" + errorMessage
+          ) {
             SetShowError("User not found. Please try again..");
           }
-          
         });
     }
   };
