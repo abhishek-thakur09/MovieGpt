@@ -31,10 +31,6 @@ const Login = () => {
     const Password = password.current.value;
     const Name = isSignInForm ? null : name.current?.value;
 
-    console.log(Email);
-    console.log(Password);
-    console.log(Name);
-
     const msg = checkValidatedata(Email, Password, Name, isSignInForm);
     SetShowError(msg);
 
@@ -45,8 +41,6 @@ const Login = () => {
       createUserWithEmailAndPassword(auth, Email, Password)
         .then((userCredential) => {
           const user = userCredential.user;
-          console.log(user);
-
           // UpdateProfile
           updateProfile(user, {
             displayName: Name,
@@ -58,8 +52,6 @@ const Login = () => {
                 email:email,
                 displayName:displayName
               }));
-              navigate("/browse");
-
               // Profile updated!
               // ...
             })
@@ -79,8 +71,6 @@ const Login = () => {
           // Signed in
           const user = userCredential.user;
           console.log(user);
-          navigate("/browse");
-
           // ...
         })
         .catch((error) => {

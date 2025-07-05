@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth } from "../utils/Firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { removeUser } from "../utils/UserSlice";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
+import { addUser, removeUser } from "../utils/UserSlice";
+import { Logo, user_AVATAR } from "../utils/constants";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
@@ -11,14 +12,33 @@ const Header = () => {
   const dispatch = useDispatch();
   const user = useSelector((store) => store.user);
 
-  console.log(user);
   
+    useEffect(() => {
+     const unsubscribe =  onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const { uid, email, displayName } = user;
+          // for signin & signUp it will be called
+          dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+          navigate("/browse");
+        } else {
+          // User is signed outx
+          // ...
+          dispatch(removeUser());
+          navigate("/");
+        }
+
+        return ()=> unsubscribe();
+      });
+    }, []);
+
+
+
+
   const handlesignOut = () => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
         dispatch(removeUser);
-        navigate("/");
       })
       .catch((error) => {
         // An error happened.
@@ -36,8 +56,7 @@ const Header = () => {
     <div className="absolute w-full px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between md:px-4">
       <img
         className="w-44"
-        src="
-https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production/consent/87b6a5c0-0104-4e96-a291-092c11350111/01938dc4-59b3-7bbc-b635-c4131030e85f/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
+        src={Logo}
         alt="logo"
       />
 
@@ -46,7 +65,7 @@ https://help.nflxext.com/helpcenter/OneTrust/oneTrust_production/consent/87b6a5c
         <div className="relative py-4 inline-block group">
           <img
             className="w-10 h-10"
-            src="https://occ-0-2590-2186.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABUi6ZpOspE7SWzYlN-o_H3QkoVd5zpDcPgQEQWWl73eQ9kxZiA9t6hgFjyw7ITQuAKIgfZdBkv02PdLFHos7NFC5SGlz-Nk.png?r=66c"
+            src={user_AVATAR}
             alt="usericon"
             onClick={toggleDropdown}
           ></img>
